@@ -831,25 +831,41 @@
       return this.setupEventListeners();
     };
 
-    Dropzone.prototype.filesize = function(size) {
-      var cutoff, i, selectedSize, selectedUnit, unit, units, _i, _len;
-      selectedSize = 0;
-      selectedUnit = "b";
-      if (size > 0) {
-        units = ['TB', 'GB', 'MB', 'KB', 'b'];
-        for (i = _i = 0, _len = units.length; _i < _len; i = ++_i) {
-          unit = units[i];
-          cutoff = Math.pow(this.options.filesizeBase, 4 - i) / 10;
-          if (size >= cutoff) {
-            selectedSize = size / Math.pow(this.options.filesizeBase, 4 - i);
-            selectedUnit = unit;
-            break;
-          }
-        }
-        selectedSize = Math.round(10 * selectedSize) / 10;
-      }
-      return "<strong>" + selectedSize + "</strong> " + selectedUnit;
-    };
+    Dropzone.prototype.filesize = function (size) {
+            var selectedSize;
+            var selectedUnit;
+
+            var fByte = 1024;
+            var fKilobyte = 1024 * fByte;
+            var fMegabyte = 1024 * fKilobyte;
+            var fGigabayt = 1024 * fMegabyte;
+            var fTerabayt = 1024 * fGigabayt;
+
+
+            selectedSize = size;
+            if (size < fByte) {
+                selectedUnit = "b";
+            } else if (size >= fByte && size <= fKilobyte) {
+                selectedSize = size / fByte;
+                selectedUnit = "KB";
+            } else if (size >= fKilobyte && size < fMegabyte) {
+                selectedSize = size / fKilobyte;
+                selectedUnit = "MB";
+            } else if (size >= fMegabyte && size < fMegabyte) {
+                selectedSize = size / fMegabyte;
+                selectedUnit = "GB";
+            } else if (size >= fGigabayt && size < fTerabayt) {
+                selectedSize = size / fGigabayt;
+                selectedUnit = "TB";
+            } else {
+                selectedSize = size / fTerabayt;
+                selectedUnit = "PB";
+            }
+
+            selectedSize = Math.round(100 * selectedSize) / 100;
+            console.log(size + " byte   => " + selectedSize + " " + selectedUnit);
+            return "<strong>" + selectedSize + "</strong> " + selectedUnit;
+            };
 
     Dropzone.prototype._updateMaxFilesReachedClass = function() {
       if ((this.options.maxFiles != null) && this.getAcceptedFiles().length >= this.options.maxFiles) {
